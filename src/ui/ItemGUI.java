@@ -28,7 +28,7 @@ public class ItemGUI extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        // ========== 왼쪽 패널 ==========
+        // 왼쪽 패널
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setPreferredSize(new Dimension(400, 0));
@@ -69,12 +69,12 @@ public class ItemGUI extends JFrame
         backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         backButton.addActionListener(e -> {
             dispose();
-            new MainGUI();
+            new AdminGUI();
         });
         leftPanel.add(Box.createVerticalStrut(10));
         leftPanel.add(backButton);
 
-        // ========== 오른쪽 테이블 ==========
+        // 오른쪽 테이블
         String[] columns = {"이름", "가격", "바코드", "유통기한"};
         tableModel = new DefaultTableModel(columns, 0);
         itemTable = new JTable(tableModel);
@@ -90,7 +90,6 @@ public class ItemGUI extends JFrame
             }
         });
 
-        // ========== 프레임에 추가 ==========
         add(leftPanel, BorderLayout.WEST);
         add(scrollPane, BorderLayout.CENTER);
 

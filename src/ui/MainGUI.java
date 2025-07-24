@@ -27,9 +27,9 @@ public class MainGUI extends JFrame {
 
             if (option == JOptionPane.OK_OPTION) {
                 String pw = new String(pwField.getPassword());
-                if ("1234".equals(pw)) {
+                if (pw.equals("1234")) {
                     dispose();
-                    new ItemGUI();
+                    new AdminGUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "비밀번호가 틀렸습니다!");
                 }

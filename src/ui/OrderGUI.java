@@ -3,6 +3,8 @@ package ui;
 
 import model.Item;
 import service.ItemService;
+import dao.OrderDAO;
+import dao.DiscountDAO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -54,7 +56,7 @@ public class OrderGUI extends JFrame {
 
         for (int i = 0; i < itemList.size(); i++) {
             Item item = itemList.get(i);
-            JButton btn = new JButton(item.getMenu() + ":" + item.getPrice());
+            JButton btn = new JButton(item.getMenu());  // 버튼엔 메뉴명만
             btn.addActionListener(this::handleMenuClick);
             menuButtons[i] = btn;
             panel.add(btn);
@@ -66,7 +68,7 @@ public class OrderGUI extends JFrame {
     private void initBottomPanel() {
         JPanel panel = new JPanel();
 
-        String[] actions = {"주문", "취소", "계산"};
+        String[] actions = {"취소", "계산"};
         actionButtons = new JButton[actions.length];
 
         for (int i = 0; i < actions.length; i++) {
@@ -81,8 +83,8 @@ public class OrderGUI extends JFrame {
 
         JButton backButton = new JButton("뒤로가기");
         backButton.addActionListener(e -> {
-            dispose();         // 현재 주문창 닫기
-            new MainGUI();     // 메인 메뉴 다시 열기 (MainGUI 클래스 필요)
+            dispose();
+            new MainGUI();
         });
         panel.add(backButton);
 
@@ -95,25 +97,85 @@ public class OrderGUI extends JFrame {
         totalField.setText("");
     }
 
+    private void updateTotal() {
+        totalPrice = 0;
+        DiscountDAO discountDAO = new DiscountDAO();
+
+        for (Vector<String> row : data) {
+            String menu = row.get(0).split(" ")[0];
+            int price = Integer.parseInt(row.get(1));
+            int count = Integer.parseInt(row.get(2));
+            String barcode = service.getBarcodeByMenu(menu);
+            String discount = discountDAO.getDiscountType(barcode);
+
+            if (discount.equals("1+1") && count >= 2) {
+                int payCount = count - (count / 2);
+                totalPrice += payCount * price;
+            } else if (discount.equals("2+1") && count >= 3) {
+                int payCount = count - (count / 3);
+                totalPrice += payCount * price;
+            } else {
+                totalPrice += count * price;
+            }
+        }
+        totalField.setText(String.valueOf(totalPrice));
+    }
+
     private void handleActionClick(ActionEvent e) {
         Object src = e.getSource();
 
-        if (src == actionButtons[0]) {  // 주문
-            totalPrice = 0;
-            for (Vector<String> row : data) {
-                int price = Integer.parseInt(row.get(1));
-                int count = Integer.parseInt(row.get(2));  // 수량도 가져와야 함
-                totalPrice += price * count;
-            }
-            totalField.setText(String.valueOf(totalPrice));
-        } else if (src == actionButtons[1]) {  // 취소
+        if (src == actionButtons[0]) {  // 취소
             reset();
-        } else if (src == actionButtons[2]) {  // 계산
+        } else if (src == actionButtons[1]) {  // 계산
+            // 1. 할인 조건 누락 체크
+            StringBuilder warning = new StringBuilder();
+            DiscountDAO discountDAO = new DiscountDAO();
+
+            for (Vector<String> row : data) {
+                String menu = row.get(0).split(" ")[0];
+                int count = Integer.parseInt(row.get(2));
+                String barcode = service.getBarcodeByMenu(menu);
+                String discount = discountDAO.getDiscountType(barcode);
+
+                if (discount.equals("1+1") && count == 1) {
+                    warning.append("- ").append(menu).append(" (1개, 1+1)").append("\n");
+                } else if (discount.equals("2+1") && count == 2) {
+                    warning.append("- ").append(menu).append(" (2개, 2+1)").append("\n");
+                }
+            }
+
+            // 2. 경고 메시지가 있다면 팝업 띄우고 선택지 제공
+            if (warning.length() > 0) {
+                int option = JOptionPane.showOptionDialog(
+                        this,
+                        "다음 상품은 할인 조건을 충족하지 않습니다:\n" + warning + "\n추가 등록 후 결제를 진행하시겠습니까?",
+                        "할인 조건 누락",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        new Object[]{"추가등록", "결제진행"},
+                        "추가등록"
+                );
+
+                if (option != 1) return;  // '추가등록' 선택 시 계산 중단
+            }
+
+            // 3. 정상 결제 진행
             String cashStr = JOptionPane.showInputDialog("현금을 입력하세요:");
             try {
                 int cash = Integer.parseInt(cashStr);
+                updateTotal();
                 int change = cash - totalPrice;
+
                 if (change >= 0) {
+                    OrderDAO dao = new OrderDAO();
+                    for (Vector<String> row : data) {
+                        String menuName = row.get(0).split(" ")[0];
+                        int price = Integer.parseInt(row.get(1));
+                        int quantity = Integer.parseInt(row.get(2));
+                        dao.insertOrder(menuName, price, quantity);
+                    }
+
                     JOptionPane.showMessageDialog(this, "거스름돈: " + change + "원");
                     reset();
                 } else {
@@ -127,15 +189,23 @@ public class OrderGUI extends JFrame {
 
     private void handleMenuClick(ActionEvent e) {
         JButton src = (JButton) e.getSource();
-        String[] parts = src.getText().split(":");
-        String menuName = parts[0];
-        String price = parts[1];
+        String menuName = src.getText();
+        Item item = service.getItemByMenu(menuName);
+        int price = item.getPrice();
+        String barcode = item.getBarcode();
+
+        DiscountDAO discountDAO = new DiscountDAO();
+        String discount = discountDAO.getDiscountType(barcode);
+        String menuLabel = menuName;
+        if (!discount.equals("NONE")) {
+            menuLabel += " [" + discount + "]";
+        }
 
         boolean found = false;
         for (Vector<String> row : data) {
-            if (row.get(0).equals(menuName)) {
-                int count = Integer.parseInt(row.get(2));
-                row.set(2, String.valueOf(count + 1));
+            if (row.get(0).equals(menuLabel)) {
+                int count = Integer.parseInt(row.get(2)) + 1;
+                row.set(2, String.valueOf(count));
                 found = true;
                 break;
             }
@@ -143,13 +213,14 @@ public class OrderGUI extends JFrame {
 
         if (!found) {
             Vector<String> newRow = new Vector<>();
-            newRow.add(menuName);
-            newRow.add(price);
+            newRow.add(menuLabel);
+            newRow.add(String.valueOf(price));
             newRow.add("1");
             data.add(newRow);
         }
 
         model.setDataVector(data, header);
+        updateTotal();
     }
 
     public static void main(String[] args) {
