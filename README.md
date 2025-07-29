@@ -66,11 +66,6 @@ UI와 데이터 처리를 분리하여 **확장성과 유지보수성**을 고�
 2. 프로젝트에서 JDBC 연결 설정 확인 (`ItemDBConn`)
 3. `MainGUI` 실행
 
-```bash
-javac MainGUI.java
-java ui.MainGUI
-```
-
 ---
 
 ## 💡 주요 기술적 도전 과제
