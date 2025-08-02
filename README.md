@@ -60,14 +60,6 @@ UI와 데이터 처리를 분리하여 **확장성과 유지보수성**을 고�
 
 ---
 
-## 🚀 실행 방법
-
-1. MySQL에서 `posdb` 데이터베이스 생성 및 테이블 세팅
-2. 프로젝트에서 JDBC 연결 설정 확인 (`ItemDBConn`)
-3. `MainGUI` 실행
-
----
-
 ## 💡 주요 기술적 도전 과제
 
 - ✅ 할인 정책 (1+1, 2+1) 적용 시 조건 분기 및 계산 최적화
@@ -77,6 +69,20 @@ UI와 데이터 처리를 분리하여 **확장성과 유지보수성**을 고�
 
 ---
 
-## 📷 실행 화면 (예시)
+## 📷 실행 화면
 
-> 추후 이미지 캡처 추가 예정
+| 상품 관리 화면 | 주문 화면 |
+|:--:|:--:|
+| <img width="666" height="371" alt="Image" src="https://github.com/user-attachments/assets/95a4910b-1f5f-467a-9320-6ac1c5be7dea" /> | <img width="591" height="296" alt="Image" src="https://github.com/user-attachments/assets/fe832b32-19f8-4f5d-8901-7ff3d2a3ede1" /> |
+
+| 시재 확인 화면 | 할인 행사 관리 화면 |
+|:--:|:--:|
+| <img width="291" height="408" alt="Image" src="https://github.com/user-attachments/assets/7a1f1218-ea00-43ae-bb02-4dd53f48a996" /> | <img width="441" height="296" alt="Image" src="https://github.com/user-attachments/assets/14bea7bd-4c84-4368-b1de-4b60b6cda63e" /> |
+
+---
+
+## 🚀 실행 방법
+
+1. MySQL에서 `posdb` 데이터베이스 생성 및 테이블 세팅
+2. 프로젝트에서 JDBC 연결 설정 확인 (`ItemDBConn`)
+3. `MainGUI` 실행
