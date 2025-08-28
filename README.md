@@ -73,7 +73,7 @@ UI와 데이터 처리를 분리하여 **확장성과 유지보수성**을 고�
 
 | 상품 관리 화면 | 주문 화면 |
 |:--:|:--:|
-| <img width="666" height="371" alt="Image" src="https://github.com/user-attachments/assets/95a4910b-1f5f-467a-9320-6ac1c5be7dea" /> | <img width="591" height="296" alt="Image" src="https://github.com/user-attachments/assets/fe832b32-19f8-4f5d-8901-7ff3d2a3ede1" /> |
+| <img width="666" height="371" alt="Image" src="https://github.com/user-attachments/assets/95a4910b-1f5f-467a-9320-6ac1c5be7dea" /> | <img width="666" height="333" alt="Image" src="https://github.com/user-attachments/assets/ca118ffb-0f04-4bee-9869-db3e367c72c1" /> |
 
 | 시재 확인 화면 | 할인 행사 관리 화면 |
 |:--:|:--:|
