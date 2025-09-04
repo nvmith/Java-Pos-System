@@ -10,7 +10,7 @@ Java Swing을 활용하여 구현한 **간단한 포스(Point of Sale) 시스템
 
 - Java 기반 GUI 애플리케이션 개발 능력 강화
 - 실사용 시나리오 기반의 주문 흐름, 할인 정책, 매출 통계 구현
-- DAO/Service/UI 구조 분리 경험
+- DAO/Service/UI 구조 분리
 
 ---
 
